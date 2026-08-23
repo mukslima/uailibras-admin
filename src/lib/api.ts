@@ -111,7 +111,7 @@ export async function updateNews(id: string, payload: Partial<NewsPayload>) {
 }
 
 export async function submitNews(id: string) {
-  return apiFetch<News>(`/news/${id}/submit`, { method: "POST" });
+  return apiFetch<News>(`/news/${id}/submit`, { method: "POST", body: JSON.stringify({}) });
 }
 
 export async function approveNews(id: string, comment?: string) {
@@ -122,12 +122,16 @@ export async function rejectNews(id: string, comment: string) {
   return apiFetch<News>(`/news/${id}/reject`, { method: "POST", body: JSON.stringify({ comment }) });
 }
 
-export async function publishNews(id: string) {
-  return apiFetch<News>(`/news/${id}/publish`, { method: "POST" });
+export async function publishNews(id: string, featuredPosition: 1 | 2 | null) {
+  return apiFetch<News>(`/news/${id}/publish`, { method: "POST", body: JSON.stringify({ featuredPosition }) });
 }
 
 export async function archiveNews(id: string) {
-  return apiFetch<News>(`/news/${id}/archive`, { method: "POST" });
+  return apiFetch<News>(`/news/${id}/archive`, { method: "POST", body: JSON.stringify({}) });
+}
+
+export async function featureNews(id: string, featuredPosition: 1 | 2 | null) {
+  return apiFetch<News>(`/news/${id}/feature`, { method: "POST", body: JSON.stringify({ featuredPosition }) });
 }
 
 export async function listCategories(includeInactive = true) {

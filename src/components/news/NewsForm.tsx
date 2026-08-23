@@ -21,6 +21,7 @@ const emptyPayload: NewsPayload = {
   tags: [],
   mediaIds: [],
   coverImageId: null,
+  requestedFeaturedPosition: null,
 };
 
 export function NewsForm({ news }: { news?: News }) {
@@ -41,6 +42,7 @@ export function NewsForm({ news }: { news?: News }) {
           tags: [],
           mediaIds: news.media.map((item) => item.media.id),
           coverImageId: news.coverImageId,
+          requestedFeaturedPosition: news.requestedFeaturedPosition ?? null,
         }
       : emptyPayload,
   );
@@ -192,6 +194,38 @@ export function NewsForm({ news }: { news?: News }) {
             ))}
           </select>
         </label>
+
+        <fieldset className="checkbox-grid">
+          <legend>Sugestao de destaque</legend>
+          <label className="checkbox-pill">
+            <input
+              type="radio"
+              name="requestedFeaturedPosition"
+              checked={payload.requestedFeaturedPosition === null}
+              onChange={() => setPayload({ ...payload, requestedFeaturedPosition: null })}
+            />
+            Noticia normal
+          </label>
+          <label className="checkbox-pill">
+            <input
+              type="radio"
+              name="requestedFeaturedPosition"
+              checked={payload.requestedFeaturedPosition === 1}
+              onChange={() => setPayload({ ...payload, requestedFeaturedPosition: 1 })}
+            />
+            Destaque principal
+          </label>
+          <label className="checkbox-pill">
+            <input
+              type="radio"
+              name="requestedFeaturedPosition"
+              checked={payload.requestedFeaturedPosition === 2}
+              onChange={() => setPayload({ ...payload, requestedFeaturedPosition: 2 })}
+            />
+            Destaque secundario
+          </label>
+          <p className="muted">Esta e uma sugestao. A posicao final podera ser alterada durante a revisao.</p>
+        </fieldset>
 
         <fieldset className="checkbox-grid">
           <legend>Categorias adicionais</legend>

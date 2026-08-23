@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { formatDate } from "@/lib/format";
+import { featuredLabels } from "@/lib/permissions";
 import type { News, NewsPayload, Category, Tag, Media } from "@/lib/types";
 
 export function NewsPreview({
@@ -22,6 +23,8 @@ export function NewsPreview({
   const summary = news?.summary ?? draft?.summary ?? "";
   const content = news?.content ?? draft?.content ?? "";
   const coverImage = news?.coverImage ?? cover;
+  const requestedFeaturedPosition = news?.requestedFeaturedPosition ?? draft?.requestedFeaturedPosition ?? null;
+  const featuredPosition = news?.featuredPosition ?? null;
 
   return (
     <article className="preview-article">
@@ -38,6 +41,8 @@ export function NewsPreview({
       <div className="tag-row">
         {primaryCategory ? <span className="tag-chip">{primaryCategory.name}</span> : null}
         {news ? <StatusBadge status={news.status} /> : null}
+        {featuredPosition ? <span className="tag-chip">{featuredLabels[featuredPosition]}</span> : null}
+        {!featuredPosition && requestedFeaturedPosition ? <span className="tag-chip">Sugestao: {featuredLabels[requestedFeaturedPosition]}</span> : null}
       </div>
       <h1>{title}</h1>
       {summary ? <p className="muted">{summary}</p> : null}

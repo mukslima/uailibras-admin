@@ -15,6 +15,13 @@ export const statusLabels = {
   ARCHIVED: "Arquivada",
 } as const;
 
+export const featuredLabels: Record<"normal" | 1 | 2 | 3, string> = {
+  normal: "Noticia normal",
+  1: "Destaque principal",
+  2: "Destaque secundario",
+  3: "Destaque secundario anterior",
+};
+
 export function canCreateNews(role: Role) {
   return role === "ADMIN" || role === "AUTHOR";
 }

@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import * as api from "@/lib/api";
 import { friendlyError } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
-import { canActAsReviewer, canPublishNews } from "@/lib/permissions";
+import { canActAsReviewer, canPublishNews, featuredLabels } from "@/lib/permissions";
 import type { News } from "@/lib/types";
 
 export default function RevisarNoticiaPage() {
@@ -22,6 +22,7 @@ export default function RevisarNoticiaPage() {
   const [news, setNews] = useState<News | null>(null);
   const [comment, setComment] = useState("");
   const [approveComment, setApproveComment] = useState("");
+  const [featuredPosition, setFeaturedPosition] = useState<1 | 2 | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -30,7 +31,9 @@ export default function RevisarNoticiaPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setNews(await api.getNews(params.id));
+      const loaded = await api.getNews(params.id);
+      setNews(loaded);
+      setFeaturedPosition(loaded.featuredPosition === 1 || loaded.featuredPosition === 2 ? loaded.featuredPosition : loaded.requestedFeaturedPosition ?? null);
     } catch (err) {
       setError(friendlyError(err));
     } finally {
@@ -77,7 +80,7 @@ export default function RevisarNoticiaPage() {
     setSaving(true);
     setError(null);
     try {
-      await api.publishNews(news.id);
+      await api.publishNews(news.id, featuredPosition);
       router.replace("/painel/revisoes");
     } catch (err) {
       setError(friendlyError(err));
@@ -140,10 +143,52 @@ export default function RevisarNoticiaPage() {
                 ) : null}
 
                 {canPublishNews(user, news) ? (
-                  <ConfirmButton message="Publicar esta noticia? Apos a publicacao ela ficara disponivel para o site publico." onConfirm={publish} disabled={saving} className="button primary">
-                    <Send size={17} aria-hidden />
-                    Publicar
-                  </ConfirmButton>
+                  <>
+                    <fieldset className="checkbox-grid">
+                      <legend>Exibicao no site</legend>
+                      <label className="checkbox-pill">
+                        <input
+                          type="radio"
+                          name="featuredPosition"
+                          checked={featuredPosition === null}
+                          onChange={() => setFeaturedPosition(null)}
+                        />
+                        Noticia normal
+                      </label>
+                      <label className="checkbox-pill">
+                        <input
+                          type="radio"
+                          name="featuredPosition"
+                          checked={featuredPosition === 1}
+                          onChange={() => setFeaturedPosition(1)}
+                        />
+                        Destaque principal
+                      </label>
+                      <label className="checkbox-pill">
+                        <input
+                          type="radio"
+                          name="featuredPosition"
+                          checked={featuredPosition === 2}
+                          onChange={() => setFeaturedPosition(2)}
+                        />
+                        Destaque secundario
+                      </label>
+                      {news.requestedFeaturedPosition ? (
+                        <p className="muted">Sugestao do autor: {featuredLabels[news.requestedFeaturedPosition]}.</p>
+                      ) : (
+                        <p className="muted">Sugestao do autor: noticia normal.</p>
+                      )}
+                    </fieldset>
+                    <ConfirmButton
+                      message={`Publicar esta noticia?\n\nExibicao: ${featuredPosition ? featuredLabels[featuredPosition] : featuredLabels.normal}\n\n${featuredPosition === 1 ? "Ao publicar como destaque principal, os destaques anteriores serao reorganizados automaticamente." : featuredPosition === 2 ? "Ao publicar como destaque secundario, os destaques secundarios anteriores serao reorganizados automaticamente." : "A noticia sera publicada como noticia normal."}`}
+                      onConfirm={publish}
+                      disabled={saving}
+                      className="button primary"
+                    >
+                      <Send size={17} aria-hidden />
+                      Publicar
+                    </ConfirmButton>
+                  </>
                 ) : null}
               </section>
 

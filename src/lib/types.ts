@@ -59,6 +59,8 @@ export type News = {
   publishedById?: string | null;
   primaryCategoryId?: string | null;
   coverImageId?: string | null;
+  requestedFeaturedPosition?: 1 | 2 | null;
+  featuredPosition?: 1 | 2 | 3 | null;
   publishedAt?: string | null;
   createdAt: string;
   updatedAt: string;
@@ -92,5 +94,6 @@ export type NewsPayload = {
   tagIds: string[];
   tags: string[];
   coverImageId?: string | null;
+  requestedFeaturedPosition?: 1 | 2 | null;
   mediaIds: string[];
 };
