@@ -1,7 +1,7 @@
 import { ApiError } from "./errors";
 import type { Category, Media, News, NewsPayload, NewsStatus, Paginated, Tag, User } from "./types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333";
+const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333").replace(/\/$/, "");
 
 let accessToken: string | null = null;
 let refreshPromise: Promise<{ accessToken: string; user: User }> | null = null;
@@ -12,13 +12,29 @@ export function setAccessToken(token: string | null) {
 
 async function parseResponse<T>(response: Response): Promise<T> {
   const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
+  const data = text ? safeJsonParse(text) : null;
 
   if (!response.ok) {
-    throw new ApiError(response.status, data?.message ?? "Erro na requisicao.");
+    throw new ApiError(response.status, getErrorMessage(data));
   }
 
   return data as T;
+}
+
+function safeJsonParse(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+function getErrorMessage(data: unknown) {
+  if (data && typeof data === "object" && "message" in data && typeof data.message === "string") {
+    return data.message;
+  }
+
+  return "Erro na requisicao.";
 }
 
 type ApiOptions = RequestInit & {
