@@ -62,6 +62,7 @@ export type News = {
   requestedFeaturedPosition?: 1 | 2 | null;
   featuredPosition?: 1 | 2 | 3 | null;
   publishedAt?: string | null;
+  revisionOfId?: string | null;
   createdAt: string;
   updatedAt: string;
   author: User;

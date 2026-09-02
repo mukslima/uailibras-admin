@@ -61,10 +61,10 @@ export default function DashboardPage() {
         <>
           <section className="grid-cards" aria-label="Resumo por status">
             {counts.map((item) => (
-              <div className="card metric" key={item.status}>
+              <Link className={`card metric ${item.status === "APPROVED" ? "attention" : ""}`} key={item.status} href={item.status === "APPROVED" ? "/painel/revisoes" : `/painel/noticias?status=${item.status}`}>
                 <span>{statusLabels[item.status]}</span>
                 <strong>{item.count}</strong>
-              </div>
+              </Link>
             ))}
           </section>
 
@@ -89,11 +89,11 @@ export default function DashboardPage() {
                   <tbody>
                     {items.slice(0, 8).map((news) => (
                       <tr key={news.id}>
-                        <td>{news.title}</td>
-                        <td><StatusBadge status={news.status} /></td>
-                        <td>{news.author.name}</td>
-                        <td>{formatDate(news.updatedAt)}</td>
-                        <td><Link className="ghost-button" href={`/painel/noticias/${news.id}/preview`}>Abrir</Link></td>
+                        <td data-label="Titulo">{news.title}</td>
+                        <td data-label="Status"><StatusBadge status={news.status} /></td>
+                        <td data-label="Autor">{news.author.name}</td>
+                        <td data-label="Atualizacao">{formatDate(news.updatedAt)}</td>
+                        <td data-label="Acoes"><Link className="ghost-button" href={`/painel/noticias/${news.id}/preview`}>Abrir</Link></td>
                       </tr>
                     ))}
                   </tbody>

@@ -48,7 +48,7 @@ export default function TagsPage() {
       <header className="page-header">
         <div>
           <h1>Tags</h1>
-          <p className="muted">Listagem e criacao de tags. O backend ainda nao possui update/delete.</p>
+          <p className="muted">Listagem e criacao de tags para organizar noticias.</p>
         </div>
       </header>
 
@@ -57,6 +57,7 @@ export default function TagsPage() {
           <label className="field">
             <span>Nome</span>
             <input value={name} onChange={(event) => setName(event.target.value)} minLength={2} maxLength={80} required />
+            <small>Evite duplicar tags com nomes parecidos.</small>
           </label>
           <button className="button primary" type="submit">Criar tag</button>
         </form>
@@ -79,8 +80,8 @@ export default function TagsPage() {
               <tbody>
                 {items.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.name}</td>
-                    <td>{item.slug}</td>
+                    <td data-label="Nome">{item.name}</td>
+                    <td data-label="Slug">{item.slug}</td>
                   </tr>
                 ))}
               </tbody>

@@ -1,5 +1,5 @@
 export function LoadingState({ message = "Carregando..." }: { message?: string }) {
-  return <div className="panel-state">{message}</div>;
+  return <div className="panel-state loading">{message}</div>;
 }
 
 export function EmptyState({ message }: { message: string }) {
@@ -25,6 +25,14 @@ export function SuccessMessage({ message }: { message: string }) {
 export function ErrorMessage({ message }: { message: string }) {
   return (
     <div className="inline-message error" role="alert">
+      {message}
+    </div>
+  );
+}
+
+export function WarningMessage({ message }: { message: string }) {
+  return (
+    <div className="inline-message warning" role="status">
       {message}
     </div>
   );

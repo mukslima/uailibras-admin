@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Save, Send, Upload, X } from "lucide-react";
+import { ImagePlus, Save, Send, Upload, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { RichTextEditor } from "./RichTextEditor";
 import { NewsPreview } from "./NewsPreview";
@@ -162,27 +162,38 @@ export function NewsForm({ news }: { news?: News }) {
           <textarea value={payload.summary} onChange={(event) => setPayload({ ...payload, summary: event.target.value })} required minLength={10} maxLength={320} />
         </label>
 
-        <label className="field">
-          <span>Imagem de capa</span>
-          <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => void handleCover(event.target.files?.[0])} />
-        </label>
-        {uploading ? <p className="muted">Enviando capa...</p> : null}
-        {cover ? (
-          <div>
-            <Image
-              className="cover-preview"
-              src={cover.url}
-              alt={cover.originalName}
-              width={cover.width ?? 1200}
-              height={cover.height ?? 675}
-              unoptimized
-            />
-            <button type="button" className="ghost-button" onClick={() => { setCover(null); setPayload({ ...payload, coverImageId: null }); }}>
-              <X size={16} aria-hidden />
-              Remover capa
-            </button>
+        <div className="cover-uploader">
+          <div className="section-title">
+            <div>
+              <strong>Imagem de capa</strong>
+              <p className="muted">PNG, JPG ou WEBP. Use imagem horizontal sempre que possivel.</p>
+            </div>
+            <label className="ghost-button">
+              <ImagePlus size={17} aria-hidden />
+              {cover ? "Trocar" : "Selecionar"}
+              <input type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(event) => void handleCover(event.target.files?.[0])} />
+            </label>
           </div>
-        ) : null}
+          {uploading ? <p className="muted">Enviando capa...</p> : null}
+          {cover ? (
+            <div className="cover-preview-wrap">
+              <Image
+                className="cover-preview"
+                src={cover.url}
+                alt={cover.originalName}
+                width={cover.width ?? 1200}
+                height={cover.height ?? 675}
+                unoptimized
+              />
+              <button type="button" className="ghost-button" onClick={() => { setCover(null); setPayload({ ...payload, coverImageId: null }); }}>
+                <X size={16} aria-hidden />
+                Remover capa
+              </button>
+            </div>
+          ) : (
+            <p className="muted">Nenhuma capa selecionada.</p>
+          )}
+        </div>
 
         <label className="field">
           <span>Categoria principal</span>
@@ -197,33 +208,35 @@ export function NewsForm({ news }: { news?: News }) {
 
         <fieldset className="checkbox-grid">
           <legend>Sugestao de destaque</legend>
-          <label className="checkbox-pill">
+          <div className="choice-grid">
+          <label className="choice-card">
             <input
               type="radio"
               name="requestedFeaturedPosition"
               checked={payload.requestedFeaturedPosition === null}
               onChange={() => setPayload({ ...payload, requestedFeaturedPosition: null })}
             />
-            Noticia normal
+            <span><strong>Noticia normal</strong><small>Publicada sem ocupar area de destaque.</small></span>
           </label>
-          <label className="checkbox-pill">
+          <label className="choice-card">
             <input
               type="radio"
               name="requestedFeaturedPosition"
               checked={payload.requestedFeaturedPosition === 1}
               onChange={() => setPayload({ ...payload, requestedFeaturedPosition: 1 })}
             />
-            Destaque principal
+            <span><strong>Destaque principal</strong><small>Sugere a posicao principal da Home para a revisao.</small></span>
           </label>
-          <label className="checkbox-pill">
+          <label className="choice-card">
             <input
               type="radio"
               name="requestedFeaturedPosition"
               checked={payload.requestedFeaturedPosition === 2}
               onChange={() => setPayload({ ...payload, requestedFeaturedPosition: 2 })}
             />
-            Destaque secundario
+            <span><strong>Destaque secundario</strong><small>Sugere uma posicao secundaria na Home.</small></span>
           </label>
+          </div>
           <p className="muted">Esta e uma sugestao. A posicao final podera ser alterada durante a revisao.</p>
         </fieldset>
 
@@ -294,6 +307,7 @@ export function NewsForm({ news }: { news?: News }) {
 
         <label className="field">
           <span>Conteudo</span>
+          <small>Use a toolbar para estruturar texto, alinhar paragrafos e ajustar imagens inseridas.</small>
           <RichTextEditor value={payload.content} onChange={(content) => setPayload((current) => ({ ...current, content }))} />
         </label>
 

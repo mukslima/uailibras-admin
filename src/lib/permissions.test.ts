@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canActAsReviewer, canCreateNews, canEditNews, canManageAdmin, canPublishNews, canReview } from "./permissions";
+import { canActAsReviewer, canCreateNews, canEditNews, canManageAdmin, canPublishNews, canReview, canUnpublishNews } from "./permissions";
 import type { News, User } from "./types";
 
 const admin: User = {
@@ -80,6 +80,13 @@ describe("role permissions", () => {
 
   it("allows publishing approved third-party news", () => {
     expect(canPublishNews(reviewer, news({ status: "APPROVED" }))).toBe(true);
+    expect(canPublishNews(reviewer, news({ status: "ARCHIVED" }))).toBe(true);
     expect(canPublishNews(reviewer, news({ status: "IN_REVIEW" }))).toBe(false);
+  });
+
+  it("allows unpublishing only published third-party news", () => {
+    expect(canUnpublishNews(reviewer, news({ status: "PUBLISHED" }))).toBe(true);
+    expect(canUnpublishNews(reviewer, news({ status: "APPROVED" }))).toBe(false);
+    expect(canUnpublishNews(admin, news({ authorId: admin.id, status: "PUBLISHED" }))).toBe(false);
   });
 });

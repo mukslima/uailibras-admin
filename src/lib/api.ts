@@ -126,6 +126,10 @@ export async function updateNews(id: string, payload: Partial<NewsPayload>) {
   return apiFetch<News>(`/news/${id}`, { method: "PATCH", body: JSON.stringify(payload) });
 }
 
+export async function createPublishedRevision(id: string) {
+  return apiFetch<News>(`/news/${id}/revision`, { method: "POST", body: JSON.stringify({}) });
+}
+
 export async function submitNews(id: string) {
   return apiFetch<News>(`/news/${id}/submit`, { method: "POST", body: JSON.stringify({}) });
 }
@@ -144,6 +148,10 @@ export async function publishNews(id: string, featuredPosition: 1 | 2 | null) {
 
 export async function archiveNews(id: string) {
   return apiFetch<News>(`/news/${id}/archive`, { method: "POST", body: JSON.stringify({}) });
+}
+
+export async function unpublishNews(id: string) {
+  return archiveNews(id);
 }
 
 export async function featureNews(id: string, featuredPosition: 1 | 2 | null) {

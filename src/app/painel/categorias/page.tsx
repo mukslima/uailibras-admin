@@ -67,6 +67,7 @@ export default function CategoriasPage() {
           <label className="field">
             <span>Nome</span>
             <input value={name} onChange={(event) => setName(event.target.value)} minLength={2} maxLength={80} required />
+            <small>Use nomes curtos e claros. O slug e gerado automaticamente.</small>
           </label>
           <button className="button primary" type="submit">Criar categoria</button>
         </form>
@@ -91,10 +92,10 @@ export default function CategoriasPage() {
               <tbody>
                 {items.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.name}</td>
-                    <td>{item.slug}</td>
-                    <td>{item.active ? "Ativa" : "Inativa"}</td>
-                    <td><button className="ghost-button" type="button" onClick={() => void toggle(item)}>{item.active ? "Desativar" : "Ativar"}</button></td>
+                    <td data-label="Nome">{item.name}</td>
+                    <td data-label="Slug">{item.slug}</td>
+                    <td data-label="Status">{item.active ? "Ativa" : "Inativa"}</td>
+                    <td data-label="Acoes"><button className="ghost-button" type="button" onClick={() => void toggle(item)}>{item.active ? "Desativar" : "Ativar"}</button></td>
                   </tr>
                 ))}
               </tbody>

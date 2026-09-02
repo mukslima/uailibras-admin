@@ -12,7 +12,7 @@ export const statusLabels = {
   REJECTED: "Rejeitada",
   APPROVED: "Aprovada",
   PUBLISHED: "Publicada",
-  ARCHIVED: "Arquivada",
+  ARCHIVED: "Despublicada",
 } as const;
 
 export const featuredLabels: Record<"normal" | 1 | 2 | 3, string> = {
@@ -20,6 +20,12 @@ export const featuredLabels: Record<"normal" | 1 | 2 | 3, string> = {
   1: "Destaque principal",
   2: "Destaque secundario",
   3: "Destaque secundario anterior",
+};
+
+export const featuredDescriptions: Record<"normal" | 1 | 2, string> = {
+  normal: "Publicada sem ocupar area de destaque.",
+  1: "Ocupa a posicao principal da Home. Destaques atuais podem ser reorganizados.",
+  2: "Ocupa uma das posicoes secundarias da Home. Destaques secundarios podem ser reorganizados.",
 };
 
 export function canCreateNews(role: Role) {
@@ -40,6 +46,12 @@ export function canEditNews(user: User, news: News) {
   return news.authorId === user.id && (news.status === "DRAFT" || news.status === "REJECTED");
 }
 
+export function canStartPublishedRevision(user: User, news: News) {
+  if (news.status !== "PUBLISHED") return false;
+  if (user.role === "ADMIN") return true;
+  return user.role === "AUTHOR" && news.authorId === user.id;
+}
+
 export function canSubmitNews(user: User, news: News) {
   return news.authorId === user.id && (news.status === "DRAFT" || news.status === "REJECTED");
 }
@@ -49,5 +61,9 @@ export function canActAsReviewer(user: User, news: News) {
 }
 
 export function canPublishNews(user: User, news: News) {
-  return canActAsReviewer(user, news) && news.status === "APPROVED";
+  return canActAsReviewer(user, news) && (news.status === "APPROVED" || news.status === "ARCHIVED");
+}
+
+export function canUnpublishNews(user: User, news: News) {
+  return canActAsReviewer(user, news) && news.status === "PUBLISHED";
 }

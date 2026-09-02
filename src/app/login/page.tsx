@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Image from "next/image";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { friendlyError } from "@/lib/errors";
@@ -32,6 +33,7 @@ export default function LoginPage() {
     <main className="login-page">
       <section className="login-panel" aria-labelledby="login-title">
         <div>
+          <Image className="login-logo" src="/uailibras-logo.png" alt="Logo UaiLibras" width={150} height={76} priority />
           <p className="eyebrow">Painel administrativo</p>
           <h1 id="login-title">UaiLibras Admin</h1>
           <p className="muted">Entre com seu username ou e-mail para gerenciar conteudos internos.</p>

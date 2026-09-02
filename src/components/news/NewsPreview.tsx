@@ -47,7 +47,7 @@ export function NewsPreview({
       <h1>{title}</h1>
       {summary ? <p className="muted">{summary}</p> : null}
       {news ? <p className="muted">Atualizada em {formatDate(news.updatedAt)}</p> : null}
-      <div dangerouslySetInnerHTML={{ __html: content }} />
+      <div className="article-body" dangerouslySetInnerHTML={{ __html: content }} />
       {selectedTags.length > 0 ? (
         <div className="tag-row" aria-label="Tags">
           {selectedTags.map((tag) => (
