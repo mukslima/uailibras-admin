@@ -5,12 +5,14 @@ import { Plus } from "lucide-react";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { EmptyState, ErrorMessage, LoadingState, SuccessMessage } from "@/components/ui/Feedback";
 import { Modal } from "@/components/ui/Modal";
+import { useAuth } from "@/contexts/AuthContext";
 import * as api from "@/lib/api";
 import { friendlyError } from "@/lib/errors";
 import { roleLabels } from "@/lib/permissions";
 import type { Role, User } from "@/lib/types";
 
 export default function UsuariosPage() {
+  const { user } = useAuth();
   const [items, setItems] = useState<User[]>([]);
   const [form, setForm] = useState({ name: "", username: "", email: "", password: "", role: "AUTHOR" as Role });
   const [createOpen, setCreateOpen] = useState(false);
@@ -184,15 +186,26 @@ export default function UsuariosPage() {
                     <td data-label="Username">{item.username}</td>
                     <td data-label="E-mail">{item.email}</td>
                     <td data-label="Role">
-                      <select aria-label={`Role de ${item.name}`} value={item.role} onChange={(event) => void update(item.id, { role: event.target.value as Role })}>
+                      <select
+                        aria-label={`Role de ${item.name}`}
+                        value={item.role}
+                        disabled={item.id === user?.id}
+                        onChange={(event) => void update(item.id, { role: event.target.value as Role })}
+                      >
                         <option value="AUTHOR">{roleLabels.AUTHOR}</option>
                         <option value="REVIEWER">{roleLabels.REVIEWER}</option>
                         <option value="ADMIN">{roleLabels.ADMIN}</option>
                       </select>
+                      {item.id === user?.id ? <small className="muted">Sua conta</small> : null}
                     </td>
                     <td data-label="Status">{item.active ? "Ativo" : "Inativo"}</td>
                     <td data-label="Acoes">
-                      <button className="ghost-button" type="button" onClick={() => void update(item.id, { active: !item.active })}>
+                      <button
+                        className="ghost-button"
+                        type="button"
+                        disabled={item.id === user?.id && item.active}
+                        onClick={() => void update(item.id, { active: !item.active })}
+                      >
                         {item.active ? "Desativar" : "Ativar"}
                       </button>
                     </td>

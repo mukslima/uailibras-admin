@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
@@ -27,6 +27,11 @@ import { Modal } from "@/components/ui/Modal";
 type TextAlignment = "left" | "center" | "right" | "justify";
 type ImageSize = "small" | "medium" | "large" | "full";
 type ImageAlignment = "left" | "center" | "right";
+type SelectedImageState = {
+  selected: boolean;
+  size: ImageSize;
+  alignment: ImageAlignment;
+};
 
 const alignClass = {
   left: "text-align-left",
@@ -47,6 +52,36 @@ const imageAlignClass = {
   center: "image-align-center",
   right: "image-align-right",
 } satisfies Record<ImageAlignment, string>;
+
+function isImageSize(value: unknown): value is ImageSize {
+  return value === "small" || value === "medium" || value === "large" || value === "full";
+}
+
+function isImageAlignment(value: unknown): value is ImageAlignment {
+  return value === "left" || value === "center" || value === "right";
+}
+
+function getSelectedImageState(editor: Editor): SelectedImageState {
+  if (!editor.isActive("image")) {
+    return {
+      selected: false,
+      size: "large",
+      alignment: "center",
+    };
+  }
+
+  const attributes = editor.getAttributes("image");
+
+  return {
+    selected: true,
+    size: isImageSize(attributes.size) ? attributes.size : "large",
+    alignment: isImageAlignment(attributes.alignment) ? attributes.alignment : "center",
+  };
+}
+
+function sameSelectedImageState(a: SelectedImageState, b: SelectedImageState) {
+  return a.selected === b.selected && a.size === b.size && a.alignment === b.alignment;
+}
 
 const TextClassAlign = Extension.create({
   name: "textClassAlign",
@@ -106,7 +141,17 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
   const [error, setError] = useState<string | null>(null);
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
+  const [selectedImage, setSelectedImage] = useState<SelectedImageState>({
+    selected: false,
+    size: "large",
+    alignment: "center",
+  });
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const syncSelectedImage = useCallback((current: Editor) => {
+    const next = getSelectedImageState(current);
+    setSelectedImage((previous) => (sameSelectedImageState(previous, next) ? previous : next));
+  }, []);
 
   const editor = useEditor({
     extensions: [
@@ -128,6 +173,9 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
     content: value,
     immediatelyRender: false,
     onUpdate: ({ editor: current }) => onChange(current.getHTML()),
+    onCreate: ({ editor: current }) => syncSelectedImage(current),
+    onSelectionUpdate: ({ editor: current }) => syncSelectedImage(current),
+    onTransaction: ({ editor: current }) => syncSelectedImage(current),
   });
 
   const setLink = useCallback(() => {
@@ -157,11 +205,15 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
   }
 
   function setImageSize(size: ImageSize) {
-    editor?.chain().focus().updateAttributes("image", { size }).run();
+    if (!editor || !selectedImage.selected) return;
+    editor.chain().focus().updateAttributes("image", { size }).run();
+    setSelectedImage((previous) => ({ ...previous, size }));
   }
 
   function setImageAlignment(alignment: ImageAlignment) {
-    editor?.chain().focus().updateAttributes("image", { alignment }).run();
+    if (!editor || !selectedImage.selected) return;
+    editor.chain().focus().updateAttributes("image", { alignment }).run();
+    setSelectedImage((previous) => ({ ...previous, alignment }));
   }
 
   async function handleImage(file: File | undefined) {
@@ -239,14 +291,24 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
           />
         </div>
         <div className="editor-image-controls" aria-label="Ajustes da imagem selecionada">
-          <span className="muted">Imagem</span>
-          <select aria-label="Tamanho da imagem" defaultValue="large" onChange={(event) => setImageSize(event.target.value as ImageSize)}>
+          <span className="muted">{selectedImage.selected ? "Imagem" : "Sem imagem"}</span>
+          <select
+            aria-label="Tamanho da imagem"
+            value={selectedImage.size}
+            disabled={!selectedImage.selected}
+            onChange={(event) => setImageSize(event.target.value as ImageSize)}
+          >
             <option value="small">Pequena</option>
             <option value="medium">Media</option>
             <option value="large">Grande</option>
             <option value="full">Largura total</option>
           </select>
-          <select aria-label="Alinhamento da imagem" defaultValue="center" onChange={(event) => setImageAlignment(event.target.value as ImageAlignment)}>
+          <select
+            aria-label="Alinhamento da imagem"
+            value={selectedImage.alignment}
+            disabled={!selectedImage.selected}
+            onChange={(event) => setImageAlignment(event.target.value as ImageAlignment)}
+          >
             <option value="left">Esquerda</option>
             <option value="center">Centro</option>
             <option value="right">Direita</option>
