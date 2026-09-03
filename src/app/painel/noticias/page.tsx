@@ -22,6 +22,7 @@ export default function NoticiasPage() {
   const [status, setStatus] = useState<NewsStatus | "">("");
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [pendingNewsId, setPendingNewsId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -48,24 +49,30 @@ export default function NoticiasPage() {
   async function submit(id: string) {
     setError(null);
     setMessage(null);
+    setPendingNewsId(id);
     try {
       await api.submitNews(id);
       setMessage("Noticia enviada para revisao.");
       await load();
     } catch (err) {
       setError(friendlyError(err));
+    } finally {
+      setPendingNewsId(null);
     }
   }
 
   async function startPublishedRevision(id: string) {
     setError(null);
     setMessage(null);
+    setPendingNewsId(id);
     try {
       const revision = await api.createPublishedRevision(id);
       setMessage("Ciclo de edicao criado. A versao publicada continua ativa ate a republicacao.");
       window.location.href = `/painel/noticias/${revision.id}/editar`;
     } catch (err) {
       setError(friendlyError(err));
+    } finally {
+      setPendingNewsId(null);
     }
   }
 
@@ -152,15 +159,15 @@ export default function NoticiasPage() {
                           </Link>
                         ) : null}
                         {user && canSubmitNews(user, news) ? (
-                          <button className="button secondary" type="button" onClick={() => void submit(news.id)}>
+                          <button className="button secondary" type="button" disabled={pendingNewsId === news.id} onClick={() => void submit(news.id)}>
                             <Send size={16} aria-hidden />
-                            Enviar
+                            {pendingNewsId === news.id ? "Enviando..." : "Enviar"}
                           </button>
                         ) : null}
                         {user && canStartPublishedRevision(user, news) ? (
-                          <button className="ghost-button" type="button" onClick={() => void startPublishedRevision(news.id)}>
+                          <button className="ghost-button" type="button" disabled={pendingNewsId === news.id} onClick={() => void startPublishedRevision(news.id)}>
                             <RefreshCw size={16} aria-hidden />
-                            Editar publicada
+                            {pendingNewsId === news.id ? "Abrindo..." : "Editar publicada"}
                           </button>
                         ) : null}
                         {user && canPublishNews(user, news) ? (

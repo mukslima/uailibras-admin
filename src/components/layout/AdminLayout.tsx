@@ -4,9 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { FilePenLine, FolderTree, Gauge, LogOut, Menu, Newspaper, Tags, UsersRound, CheckCheck } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { canCreateNews, canManageAdmin, canReview, roleLabels } from "@/lib/permissions";
+import packageJson from "../../../package.json";
 
 const navGroups = [
   {
@@ -39,6 +40,19 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
 
+  useEffect(() => {
+    if (!open) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
   return (
     <div className="shell">
       <header className="topbar">
@@ -61,6 +75,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         ) : null}
       </header>
 
+      {open ? <button className="sidebar-backdrop" type="button" aria-label="Fechar menu" onClick={() => setOpen(false)} /> : null}
+
       <aside className={`sidebar ${open ? "is-open" : ""}`} aria-label="Navegacao principal">
         <button className="ghost-button mobile-only close-menu" type="button" onClick={() => setOpen(false)}>
           Fechar
@@ -69,6 +85,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <Image src="/uailibras-logo.png" alt="Logo UaiLibras" width={58} height={42} />
           <strong>Painel administrativo</strong>
           <span className="muted">Conteudo e operacao editorial</span>
+          <span className="muted">v{packageJson.version}</span>
         </div>
         <nav>
           {navGroups.map((group) => {

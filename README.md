@@ -17,10 +17,10 @@ Copie `.env.example` para `.env` e ajuste:
 NEXT_PUBLIC_API_URL=http://localhost:3333
 ```
 
-Em producao, use a URL publica HTTPS do backend, por exemplo:
+Em producao, use a URL publica HTTPS do backend informada pelo provedor:
 
 ```text
-NEXT_PUBLIC_API_URL=https://api.uailibras.com.br
+NEXT_PUBLIC_API_URL=https://URL-DO-BACKEND
 ```
 
 Essa variavel e publica porque o app roda no navegador. Nao coloque secrets no admin.

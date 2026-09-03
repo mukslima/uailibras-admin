@@ -98,6 +98,7 @@ h2 { font-size: 1.05rem; }
   padding: 4px 9px;
 }
 .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 18px 14px; }
+.sidebar-backdrop { display: none; }
 .sidebar-brand { border-bottom: 1px solid var(--border); display: grid; gap: 4px; margin-bottom: 18px; padding: 0 8px 16px; }
 .sidebar-brand strong { font-size: 0.95rem; }
 .nav-section { display: grid; gap: 4px; margin-bottom: 16px; }
@@ -288,6 +289,19 @@ textarea { min-height: 110px; resize: vertical; }
     transition: transform 160ms ease;
     width: 84vw;
     z-index: 30;
+  }
+  .sidebar-backdrop {
+    background: rgba(17,24,39,0.36);
+    border: 0;
+    bottom: 0;
+    display: block;
+    left: 0;
+    padding: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 100%;
+    z-index: 25;
   }
   .sidebar.is-open { transform: translateX(0); }
   .close-menu { margin-bottom: 12px; }

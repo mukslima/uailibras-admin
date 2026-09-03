@@ -11,6 +11,7 @@ export default function TagsPage() {
   const [items, setItems] = useState<Tag[]>([]);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +34,7 @@ export default function TagsPage() {
     event.preventDefault();
     setError(null);
     setMessage(null);
+    setCreating(true);
     try {
       await api.createTag({ name });
       setName("");
@@ -40,6 +42,8 @@ export default function TagsPage() {
       await load();
     } catch (err) {
       setError(friendlyError(err));
+    } finally {
+      setCreating(false);
     }
   }
 
@@ -59,7 +63,9 @@ export default function TagsPage() {
             <input value={name} onChange={(event) => setName(event.target.value)} minLength={2} maxLength={80} required />
             <small>Evite duplicar tags com nomes parecidos.</small>
           </label>
-          <button className="button primary" type="submit">Criar tag</button>
+          <button className="button primary" type="submit" disabled={creating}>
+            {creating ? "Criando..." : "Criar tag"}
+          </button>
         </form>
         {message ? <SuccessMessage message={message} /> : null}
         {error ? <ErrorMessage message={error} /> : null}

@@ -21,6 +21,7 @@ export default function UsuariosPage() {
   const [active, setActive] = useState<"all" | "active" | "inactive">("all");
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,11 +60,14 @@ export default function UsuariosPage() {
 
   async function update(id: string, payload: Partial<Pick<User, "role" | "active">>) {
     setError(null);
+    setPendingUserId(id);
     try {
       await api.updateUser(id, payload);
       await load();
     } catch (err) {
       setError(friendlyError(err));
+    } finally {
+      setPendingUserId(null);
     }
   }
 
@@ -189,7 +193,7 @@ export default function UsuariosPage() {
                       <select
                         aria-label={`Role de ${item.name}`}
                         value={item.role}
-                        disabled={item.id === user?.id}
+                        disabled={item.id === user?.id || pendingUserId === item.id}
                         onChange={(event) => void update(item.id, { role: event.target.value as Role })}
                       >
                         <option value="AUTHOR">{roleLabels.AUTHOR}</option>
@@ -203,10 +207,10 @@ export default function UsuariosPage() {
                       <button
                         className="ghost-button"
                         type="button"
-                        disabled={item.id === user?.id && item.active}
+                        disabled={(item.id === user?.id && item.active) || pendingUserId === item.id}
                         onClick={() => void update(item.id, { active: !item.active })}
                       >
-                        {item.active ? "Desativar" : "Ativar"}
+                        {pendingUserId === item.id ? "Atualizando..." : item.active ? "Desativar" : "Ativar"}
                       </button>
                     </td>
                   </tr>
