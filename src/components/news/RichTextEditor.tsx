@@ -239,24 +239,24 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
       <div className="editor-shell">
         <div className="editor-toolbar" aria-label="Ferramentas do editor">
           <div className="editor-toolgroup" aria-label="Texto">
-            <button type="button" className={editor.isActive("bold") ? "active" : ""} title="Negrito" aria-label="Negrito" onClick={() => editor.chain().focus().toggleBold().run()}>
+            <button type="button" className={editor.isActive("bold") ? "active" : ""} title="Negrito" aria-label="Negrito" aria-pressed={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
               <Bold size={17} aria-hidden />
             </button>
-            <button type="button" className={editor.isActive("italic") ? "active" : ""} title="Italico" aria-label="Italico" onClick={() => editor.chain().focus().toggleItalic().run()}>
+            <button type="button" className={editor.isActive("italic") ? "active" : ""} title="Italico" aria-label="Italico" aria-pressed={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()}>
               <Italic size={17} aria-hidden />
             </button>
           </div>
           <div className="editor-toolgroup" aria-label="Estrutura">
-            <button type="button" className={editor.isActive("heading", { level: 2 }) ? "active" : ""} title="Titulo H2" aria-label="Titulo H2" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
+            <button type="button" className={editor.isActive("heading", { level: 2 }) ? "active" : ""} title="Titulo H2" aria-label="Titulo H2" aria-pressed={editor.isActive("heading", { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
               <Heading2 size={17} aria-hidden />
             </button>
-            <button type="button" className={editor.isActive("heading", { level: 3 }) ? "active" : ""} title="Subtitulo H3" aria-label="Subtitulo H3" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
+            <button type="button" className={editor.isActive("heading", { level: 3 }) ? "active" : ""} title="Subtitulo H3" aria-label="Subtitulo H3" aria-pressed={editor.isActive("heading", { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
               <Heading3 size={17} aria-hidden />
             </button>
-            <button type="button" className={editor.isActive("bulletList") ? "active" : ""} title="Lista" aria-label="Lista" onClick={() => editor.chain().focus().toggleBulletList().run()}>
+            <button type="button" className={editor.isActive("bulletList") ? "active" : ""} title="Lista" aria-label="Lista" aria-pressed={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()}>
               <List size={17} aria-hidden />
             </button>
-            <button type="button" className={editor.isActive("orderedList") ? "active" : ""} title="Lista numerada" aria-label="Lista numerada" onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+            <button type="button" className={editor.isActive("orderedList") ? "active" : ""} title="Lista numerada" aria-label="Lista numerada" aria-pressed={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
               <ListOrdered size={17} aria-hidden />
             </button>
           </div>
@@ -275,7 +275,7 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
             </button>
           </div>
           <div className="editor-toolgroup" aria-label="Insercao">
-            <button type="button" className={editor.isActive("link") ? "active" : ""} title="Inserir link" aria-label="Inserir link" onClick={setLink}>
+            <button type="button" className={editor.isActive("link") ? "active" : ""} title="Inserir link" aria-label="Inserir link" aria-pressed={editor.isActive("link")} onClick={setLink}>
               <LinkIcon size={17} aria-hidden />
             </button>
             <button type="button" title="Inserir imagem" aria-label="Inserir imagem" onClick={() => inputRef.current?.click()} disabled={uploading}>

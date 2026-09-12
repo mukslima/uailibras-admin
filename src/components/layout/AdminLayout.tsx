@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { FilePenLine, FolderTree, Gauge, LogOut, Menu, Newspaper, Tags, UsersRound, CheckCheck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { canCreateNews, canManageAdmin, canReview, roleLabels } from "@/lib/permissions";
 import packageJson from "../../../package.json";
@@ -37,15 +37,21 @@ const navGroups = [
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const sidebarRef = useRef<HTMLElement | null>(null);
   const pathname = usePathname();
   const { user, signOut } = useAuth();
 
   useEffect(() => {
     if (!open) return;
 
+    const firstLink = sidebarRef.current?.querySelector<HTMLAnchorElement>("a");
+    window.setTimeout(() => firstLink?.focus(), 0);
+
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setOpen(false);
+        menuButtonRef.current?.focus();
       }
     }
 
@@ -56,7 +62,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="shell">
       <header className="topbar">
-        <button className="icon-button mobile-only" type="button" aria-label="Abrir menu" onClick={() => setOpen(true)}>
+        <button
+          ref={menuButtonRef}
+          className="icon-button mobile-only"
+          type="button"
+          aria-label={open ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={open}
+          aria-controls="admin-sidebar"
+          onClick={() => setOpen((current) => !current)}
+        >
           <Menu size={20} aria-hidden />
         </button>
         <Link href="/painel" className="brand">
@@ -77,8 +91,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
       {open ? <button className="sidebar-backdrop" type="button" aria-label="Fechar menu" onClick={() => setOpen(false)} /> : null}
 
-      <aside className={`sidebar ${open ? "is-open" : ""}`} aria-label="Navegacao principal">
-        <button className="ghost-button mobile-only close-menu" type="button" onClick={() => setOpen(false)}>
+      <aside id="admin-sidebar" ref={sidebarRef} className={`sidebar ${open ? "is-open" : ""}`} aria-label="Navegacao principal">
+        <button
+          className="ghost-button mobile-only close-menu"
+          type="button"
+          onClick={() => {
+            setOpen(false);
+            menuButtonRef.current?.focus();
+          }}
+        >
           Fechar
         </button>
         <div className="sidebar-brand">
